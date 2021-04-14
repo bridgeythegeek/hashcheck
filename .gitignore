@@ -50,3 +50,14 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Temp Files
+*~
+
+# Project Specific Ignores
+match.txt
+nomatch.txt
+md5.txt
+sha1.txt
+test.txt
+hashcheck
