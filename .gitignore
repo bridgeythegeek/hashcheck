@@ -55,8 +55,8 @@ dkms.conf
 *~
 
 # Project Specific Ignores
-match.txt
-nomatch.txt
+*match.txt
+*nomatch.txt
 md5.txt
 sha1.txt
 test.txt

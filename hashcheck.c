@@ -3,6 +3,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <time.h>
 
 #define THREADS 3
 #define ALLOC 1000000
@@ -118,6 +119,23 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    // Get now
+    time_t t_now = time(NULL);
+    if (t_now == -1) {
+        fprintf(stderr, "Couldn't get current time! Must abort.\n");
+        exit(EXIT_FAILURE);
+    }
+    struct tm *ptm = gmtime(&t_now);
+    if (ptm == NULL) {
+        fprintf(stderr, "Couldn't break down timestamp! Must abort.\n");
+        exit(EXIT_FAILURE);
+    }
+    char t_now_str[15];
+    if (strftime(t_now_str, sizeof(t_now_str), "%Y%m%d%H%M%S", ptm) == 0) {
+        fprintf(stderr, "Couldn't convert current time to string! Must abort.\n");
+        exit(EXIT_FAILURE);
+    }
+
     char *haystack_filename;
     if (argc == 4) {
         haystack_filename = argv[3];
@@ -137,16 +155,21 @@ int main(int argc, char *argv[]) {
 
     char **needles = NULL;
 
-    FILE *out_match = fopen("match.txt", "w");
+    char fn_buffer[32];
+    snprintf(fn_buffer, sizeof(fn_buffer), "%s_match.txt", t_now_str);
+    FILE *out_match = fopen(fn_buffer, "w");
     if (out_match == NULL) {
-        fprintf(stderr, "Couldn't open file to save matches: %s\n", "match.txt");
+        fprintf(stderr, "Couldn't open file to save matches: %s\n", fn_buffer);
         exit(EXIT_FAILURE);
     }
-    FILE *out_nomatch = fopen("nomatch.txt", "w");
+    printf("[I] Will write matches to    : %s\n", fn_buffer);
+    snprintf(fn_buffer, sizeof(fn_buffer), "%s_nomatch.txt", t_now_str);
+    FILE *out_nomatch = fopen(fn_buffer, "w");
     if (out_nomatch == NULL) {
-        fprintf(stderr, "Couldn't open file to save non-matches: %s\n", "nomatch.txt");
+        fprintf(stderr, "Couldn't open file to save non-matches: %s\n", fn_buffer);
         exit(EXIT_FAILURE);
     }
+    printf("[I] Will write non-matches to: %s\n", fn_buffer);
     
     char *line = NULL;
     size_t len = 0;
